@@ -1,30 +1,120 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a Nextjs v10 + Storyboard v6 + scss + Typescript template
 
-## Getting Started
+## Setup Guide
 
-First, run the development server:
+- Create next-js project
+
+```bash
+npx create-next-app
+```
+
+- Install scss package
+
+```bash
+npm i --save sass
+```
+
+- Rename `styles/globals.css` to `globals.scss`
+- Enable typescript packages
+
+```bash
+npm install --save-dev typescript @types/react @types/node
+```
+
+- Rename `index.js` to `index.tsx`
+- Run project to create `tsconfig.json` and `next-env.d.ts`
 
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Install storybook
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```bash
+npx sb init
+```
 
-## Learn More
+- Install storybook scss packages
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm i --save-dev @storybook/preset-scss babel-loader css-loader file-loader sass-loader style-loader
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- update `.storybook/main.js`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```js
+const path = require("path");
 
-## Deploy on Vercel
+module.exports = {
+  stories: [
+    "../stories/**/*.stories.mdx",
+    "../stories/**/*.stories.@(js|jsx|ts|tsx)",
+  ],
+  addons: [
+    "@storybook/addon-links",
+    "@storybook/addon-essentials",
+    // Handle SCSS modules
+    {
+      name: "@storybook/preset-scss",
+      options: {
+        cssLoaderOptions: {
+          modules: true,
+        },
+        sassLoaderOptions: {
+          sassOptions: {
+            includePaths: [
+              path.resolve(__dirname, "../styles"),
+              path.resolve(__dirname, "../node_modules"),
+            ],
+          },
+        },
+      },
+    },
+  ],
+};
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/import?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- update `.storybook/preview.js`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```js
+import "../styles/globals.scss";
+
+import * as nextImage from "next/image";
+
+export const parameters = {
+  actions: { argTypesRegex: "^on[A-Z].*" },
+};
+
+// Replace next/image for Storybook
+Object.defineProperty(nextImage, "default", {
+  configurable: true,
+  value: (props) => {
+    const { width, height } = props;
+    const ratio = (height / width) * 100;
+    return (
+      <div
+        style={{
+          paddingBottom: `${ratio}%`,
+          position: "relative",
+        }}
+      >
+        <img
+          style={{
+            objectFit: "cover",
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+          }}
+          {...props}
+        />
+      </div>
+    );
+  },
+});
+```
+
+- Done! start your new storybook
+
+```bash
+npm run storybook
+```
