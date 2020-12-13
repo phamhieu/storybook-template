@@ -15,7 +15,7 @@ npm i --save sass
 ```
 
 - Rename `styles/globals.css` to `globals.scss`
-- Enable typescript packages
+- Install typescript packages
 
 ```bash
 npm install --save-dev typescript @types/react @types/node
